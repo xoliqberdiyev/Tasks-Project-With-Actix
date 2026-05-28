@@ -1,0 +1,15 @@
+[package]
+name = "tasks_backend"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+actix-web = "4"
+dotenv = "0.15.0"
+tokio = { version = "1", features = ["full"] }
+sqlx = { version = "0.7", features = [
+    "runtime-tokio-rustls",
+    "sqlite",
+    "macros"
+] }
+serde = { version = "1.0", features = ["derive"] }
