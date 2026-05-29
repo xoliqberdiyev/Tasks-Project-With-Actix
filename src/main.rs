@@ -28,6 +28,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(web::Data::new(pool.clone()))
+            .app_data(web::Data::new(cnf.clone()))
             .configure(routes::auth::auth_routes)
     })
     .bind(address)?

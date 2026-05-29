@@ -1,13 +1,13 @@
 use actix_web::{HttpResponse, Responder, post, web};
-
 use crate::models::user::User;
 use crate::schemas::auth::{
     LoginSchema,
     RegisterSchema,
 };
 use crate::config::db::DbPool;
+use crate::config::config::Config;
 use crate::utils::password::{hash_password, check_password};
-
+use crate::utils::jwt::generate_jwt;
 
 #[post("/register")]
 async fn register(
@@ -70,6 +70,7 @@ async fn register(
 async fn login(
     body: web::Json<LoginSchema>,
     pool: web::Data<DbPool>,
+    cnf: web::Data<Config>,
 ) -> impl Responder {
 
     let user = sqlx::query_as::<_, User>(
@@ -86,11 +87,30 @@ async fn login(
     match user {
         Ok(Some(user)) => {
             match check_password(&body.password, &user.password) {
-                Ok(true) => HttpResponse::Ok().body("Login successful"),
-                _ => HttpResponse::Unauthorized().body("Invalid credentials"),
+                Ok(true) => {
+                    let token = generate_jwt(user.id as u64, cnf.get_ref());
+                    HttpResponse::Ok().json(serde_json::json!(
+                        {
+                            "token": token,
+                            "token_type": "Bearer",
+                            "user_id": user.id,
+                        }
+                    ))
+                },
+                _ => HttpResponse::Unauthorized().json(serde_json::json!(
+                    {
+                        "success": false,
+                        "message": "Invalid credentials"
+                    }
+                )),
             }
         }
         Err(e) => HttpResponse::InternalServerError().body(e.to_string()),
-        Ok(None) => HttpResponse::Unauthorized().body("Invalid credentials"),
+        Ok(None) => HttpResponse::Unauthorized().json(serde_json::json!(
+            {
+                "success": false,
+                "message": "Invalid credentials or user not found"
+            }
+        )),
     }
 }
