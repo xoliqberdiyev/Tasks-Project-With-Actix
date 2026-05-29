@@ -7,6 +7,7 @@ mod models;
 mod handlers;
 mod schemas;
 mod routes;
+mod utils;
 
 
 #[actix_web::main]
