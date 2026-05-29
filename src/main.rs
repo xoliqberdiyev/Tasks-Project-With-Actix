@@ -1,5 +1,9 @@
 use actix_web::{App, HttpServer, web};
 use dotenv::dotenv;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
+
+use crate::utils::swagger::ApiDoc;
 
 // local folders
 mod config;
@@ -30,6 +34,10 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(cnf.clone()))
             .configure(routes::auth::auth_routes)
+            .service(
+                SwaggerUi::new("/swagger-ui/{_:.*}")
+                    .url("/api-docs/openapi.json", ApiDoc::openapi())
+            )
     })
     .bind(address)?
     .run()

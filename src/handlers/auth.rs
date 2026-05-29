@@ -9,8 +9,18 @@ use crate::config::config::Config;
 use crate::utils::password::{hash_password, check_password};
 use crate::utils::jwt::generate_jwt;
 
+
+#[utoipa::path(
+    post,
+    path = "/register",
+    request_body = RegisterSchema,
+    responses(
+        (status = 200, description = "User created"),
+        (status = 400, description = "User already exists")
+    )
+)]
 #[post("/register")]
-async fn register(
+pub async fn register(
     pool: web::Data<DbPool>,
     body: web::Json<RegisterSchema>,
 ) -> impl Responder {
@@ -66,8 +76,18 @@ async fn register(
     };
 }
 
+
+#[utoipa::path(
+    post,
+    path = "/login",
+    request_body = LoginSchema,
+    responses(
+        (status = 200, description = "User logged in"),
+        (status = 401, description = "Invalid credentials")
+    )
+)]
 #[post("/login")]
-async fn login(
+pub async fn login(
     body: web::Json<LoginSchema>,
     pool: web::Data<DbPool>,
     cnf: web::Data<Config>,
