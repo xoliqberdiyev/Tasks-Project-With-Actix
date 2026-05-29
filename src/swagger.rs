@@ -1,20 +1,17 @@
 use utoipa::OpenApi;
 
-use crate::{
-    handlers::auth::{login, register},
-    schemas::auth::{LoginSchema, RegisterSchema},
-};
+use crate::schemas::auth::{LoginSchema, RegisterSchema};
 
 #[derive(OpenApi)]
 #[openapi(
     paths(
-        register,
-        login,
+        crate::handlers::auth::register,
+        crate::handlers::auth::login,
     ),
     components(
         schemas(
-            RegisterSchema,
             LoginSchema,
+            RegisterSchema,
         )
     )
 )]

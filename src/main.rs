@@ -3,9 +3,10 @@ use dotenv::dotenv;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
-use crate::utils::swagger::ApiDoc;
+use crate::swagger::ApiDoc;
 
 // local folders
+mod swagger;
 mod config;
 mod models;
 mod handlers;
@@ -35,7 +36,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(cnf.clone()))
             .configure(routes::auth::auth_routes)
             .service(
-                SwaggerUi::new("/swagger-ui/{_:.*}")
+                SwaggerUi::new("/swagger/{_:.*}")
                     .url("/api-docs/openapi.json", ApiDoc::openapi())
             )
     })
